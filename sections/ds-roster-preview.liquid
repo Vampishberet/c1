@@ -1,0 +1,104 @@
+{% comment %}
+  Dreamstation Esports — Roster Preview Section
+  sections/ds-roster-preview.liquid
+
+  Speed A section. Uses .ds-surface for grain texture.
+  Background: --color-surface-container-low (tonal elevation above hero's surface).
+  Players: dreamstation_player metaobject, active only, limited by max_players setting.
+  No clip-path on section edges — tonal background shift handles section transitions.
+  No inline <style> or <script>. No {% include %}. No hardcoded data.
+{% endcomment %}
+
+{%- liquid
+  assign players = shop.metaobjects.dreamstation_player.values | where: 'is_active', true
+  assign cta_url = section.settings.cta_url | default: '/pages/team'
+-%}
+
+<section
+  class="ds-roster-preview ds-surface"
+  aria-labelledby="roster-preview-heading"
+>
+  <div class="ds-roster-preview__inner">
+
+    <header class="ds-roster-preview__header ds-animate-in">
+      <p class="ds-roster-preview__sub-label" aria-hidden="true">
+        {{- section.settings.sub_label | upcase -}}
+      </p>
+      <span class="sr-only">{{ section.settings.sub_label }}</span>
+      <h2
+        id="roster-preview-heading"
+        class="ds-roster-preview__heading"
+      >
+        {{- section.settings.heading | upcase -}}
+      </h2>
+    </header>
+
+    {%- if players.size > 0 -%}
+      <div class="ds-roster-preview__grid">
+        {%- for player in players limit: section.settings.max_players -%}
+          {%- render 'ds-player-card', player: player -%}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <div class="ds-roster-preview__empty" role="status">
+        <p>Active roster under configuration. Stay locked in.</p>
+      </div>
+    {%- endif -%}
+
+    <footer class="ds-roster-preview__footer ds-animate-in">
+      {%- render 'ds-cta-button',
+        variant: 'ghost',
+        label: section.settings.cta_label,
+        url: cta_url
+      -%}
+    </footer>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Roster Preview",
+  "tag": "section",
+  "class": "ds-roster-preview-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "THE SQUAD"
+    },
+    {
+      "type": "text",
+      "id": "sub_label",
+      "label": "Sub-label",
+      "default": "RLCS 2026 · APAC REGION"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA Button Label",
+      "default": "VIEW FULL TEAM →"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "CTA Button URL"
+    },
+    {
+      "type": "range",
+      "id": "max_players",
+      "label": "Maximum Players Shown",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "Roster Preview"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,102 @@
+{% comment %}
+  Dreamstation Esports — Player Card
+  snippets/ds-player-card.liquid
+
+  Usage:
+    {% render 'ds-player-card', player: player %}
+
+  Accepts: dreamstation_player metaobject entry
+  Fields used: display_name, role, nationality, bio, photo,
+               twitter_url, twitch_url, is_substitute
+
+  Rules:
+  - border-radius: 0 everywhere
+  - Image: grayscale + contrast filter, overflows card top
+  - Diagonal accent behind image via .ds-player-card__accent
+  - SUB chip rendered if is_substitute = true (with .sr-only)
+  - Social links have :focus-visible (CSS handles it)
+  - Lazy loading on all player images
+  - alt text: "{{ player.display_name }} — {{ player.role }}"
+{% endcomment %}
+
+<article class="ds-player-card ds-animate-in" aria-label="{{ player.display_name }}">
+
+  {%- comment -%} Image zone — overflows card top {%- endcomment -%}
+  <div class="ds-player-card__image-wrap">
+    {%- comment -%} 15° diagonal purple accent behind image {%- endcomment -%}
+    <div class="ds-player-card__accent" aria-hidden="true"></div>
+
+    {%- if player.photo != blank -%}
+      {{ player.photo | image_url: width: 600 | image_tag:
+          alt: player.display_name | append: ' — ' | append: player.role,
+          class: 'ds-player-card__image ds-clip-image',
+          loading: 'lazy',
+          width: 600 }}
+    {%- else -%}
+      <div class="ds-player-card__image-placeholder" aria-hidden="true"></div>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} Card body {%- endcomment -%}
+  <div class="ds-player-card__body">
+
+    {%- comment -%} Status chips {%- endcomment -%}
+    <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;flex-wrap:wrap;">
+      {%- if player.is_substitute -%}
+        <span class="ds-chip ds-chip--sub" aria-hidden="true">SUB</span>
+        <span class="sr-only">Substitute player</span>
+      {%- else -%}
+        <span class="ds-chip" aria-hidden="true">ACTIVE</span>
+        <span class="sr-only">Active player</span>
+      {%- endif -%}
+
+      {%- if player.nationality != blank -%}
+        <span class="ds-chip ds-chip--inactive" aria-hidden="true">{{ player.nationality | upcase }}</span>
+        <span class="sr-only">Nationality: {{ player.nationality }}</span>
+      {%- endif -%}
+    </div>
+
+    <h3 class="ds-player-card__name">{{ player.display_name }}</h3>
+
+    {%- if player.role != blank -%}
+      <p class="ds-player-card__role">{{ player.role }}</p>
+    {%- endif -%}
+
+    {%- if player.bio != blank -%}
+      <p class="ds-player-card__bio">{{ player.bio }}</p>
+    {%- endif -%}
+
+    {%- comment -%} Social links {%- endcomment -%}
+    {%- if player.twitter_url != blank or player.twitch_url != blank -%}
+      <div class="ds-player-card__socials">
+
+        {%- if player.twitter_url != blank -%}
+          <a href="{{ player.twitter_url }}"
+             class="ds-player-card__social-link"
+             target="_blank"
+             rel="noopener noreferrer"
+             aria-label="{{ player.display_name }} on X (Twitter)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.629 5.905-5.629zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+        {%- endif -%}
+
+        {%- if player.twitch_url != blank -%}
+          <a href="{{ player.twitch_url }}"
+             class="ds-player-card__social-link"
+             target="_blank"
+             rel="noopener noreferrer"
+             aria-label="{{ player.display_name }} on Twitch">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+              <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+            </svg>
+          </a>
+        {%- endif -%}
+
+      </div>
+    {%- endif -%}
+
+  </div>
+
+</article>

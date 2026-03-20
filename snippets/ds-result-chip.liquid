@@ -1,0 +1,79 @@
+{% comment %}
+  Dreamstation Esports — Result Chip
+  snippets/ds-result-chip.liquid
+
+  Usage:
+    {% render 'ds-result-chip', result: result %}
+
+  Accepts: dreamstation_result metaobject entry
+  Fields used: placement, placement_number, event_name, region,
+               game_title, season, event_date, prize_usd,
+               is_featured, external_link
+
+  Renders a compact result badge: placement + event + meta line.
+  Used in competitive proof sections and results tables.
+
+  Rules:
+  - border-radius: 0
+  - Placement chip colour: green for 1st, default purple for others
+  - .sr-only on chip for screen readers
+  - Placement number determines chip variant (1 = win, else default)
+  - Prize formatted via money_without_trailing_zeros
+{% endcomment %}
+
+{%- liquid
+  assign is_first = false
+  if result.placement_number == 1
+    assign is_first = true
+  endif
+-%}
+
+<div class="ds-result-chip" style="display:flex;align-items:flex-start;gap:1rem;">
+
+  {%- comment -%} Placement badge {%- endcomment -%}
+  <div class="ds-result-chip__placement" style="flex-shrink:0;">
+    {%- if is_first -%}
+      <span class="ds-chip ds-chip--win" aria-hidden="true">{{ result.placement }}</span>
+      <span class="sr-only">{{ result.placement }} place</span>
+    {%- else -%}
+      <span class="ds-chip" aria-hidden="true">{{ result.placement }}</span>
+      <span class="sr-only">{{ result.placement }} place</span>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} Event details {%- endcomment -%}
+  <div class="ds-result-chip__details">
+    {%- if result.external_link != blank -%}
+      <a href="{{ result.external_link }}"
+         target="_blank"
+         rel="noopener noreferrer"
+         style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.9375rem;text-transform:uppercase;color:var(--color-on-surface);text-decoration:none;transition:color 0.15s ease-out;"
+         onmouseover="this.style.color='var(--color-secondary-accent)'"
+         onmouseout="this.style.color='var(--color-on-surface)'">
+        {{ result.event_name }}
+      </a>
+    {%- else -%}
+      <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.9375rem;text-transform:uppercase;color:var(--color-on-surface);">
+        {{ result.event_name }}
+      </span>
+    {%- endif -%}
+
+    {%- comment -%} Meta line: game · region · date · prize {%- endcomment -%}
+    <p style="font-family:'Manrope',sans-serif;font-size:0.75rem;color:var(--color-secondary-accent);text-transform:uppercase;letter-spacing:0.08em;margin:0.25rem 0 0;">
+      {%- if result.game_title != blank -%}{{ result.game_title }}{%- endif -%}
+      {%- if result.region != blank -%}
+        {%- if result.game_title != blank -%} · {%- endif -%}
+        {{ result.region }}
+      {%- endif -%}
+      {%- if result.event_date != blank -%}
+        {%- if result.game_title != blank or result.region != blank -%} · {%- endif -%}
+        {{ result.event_date | date: '%b %Y' }}
+      {%- endif -%}
+      {%- if result.prize_usd != blank and result.prize_usd > 0 -%}
+        {%- if result.game_title != blank or result.region != blank or result.event_date != blank -%} · {%- endif -%}
+        ${{ result.prize_usd | divided_by: 1 | append: '' }}
+      {%- endif -%}
+    </p>
+  </div>
+
+</div>

@@ -1,0 +1,133 @@
+{%- liquid
+  assign heading    = section.settings.heading    | default: 'WHERE AMBITION COMPETES.'
+  assign subheading = section.settings.subheading | default: 'Elite competition. Standout moments. A brand that plays to be remembered.'
+  assign img        = section.settings.player_image
+  assign img_alt    = section.settings.player_image_alt | default: 'Dreamstation Esports player'
+  assign cta1_label = section.settings.cta_primary_label | default: 'EXPLORE THE TEAM'
+  assign cta1_url   = section.settings.cta_primary_url   | default: '/pages/team'
+  assign cta2_label = section.settings.cta_ghost_label   | default: 'PARTNER WITH US'
+  assign cta2_url   = section.settings.cta_ghost_url     | default: '/pages/partners'
+-%}
+
+<div class="ds-hero ds-surface" aria-label="Hero">
+
+  {{- '<!-- Background layer: radial purple gradient -->' -}}
+  <div class="ds-hero__bg" aria-hidden="true"></div>
+
+  {{- '<!-- Background layer: 15deg diagonal left split -->' -}}
+  <div class="ds-hero__bg-split" aria-hidden="true"></div>
+
+  {%- if img != blank -%}
+    <div
+      class="ds-hero__player"
+      {%- if img != blank %}
+        style="--hero-player-src: url('{{ img | image_url: width: 1200 }}')"
+      {%- endif %}
+    >
+      <img
+        src="{{ img | image_url: width: 900 }}"
+        srcset="
+          {{ img | image_url: width: 480 }} 480w,
+          {{ img | image_url: width: 700 }} 700w,
+          {{ img | image_url: width: 900 }} 900w,
+          {{ img | image_url: width: 1200 }} 1200w
+        "
+        sizes="(max-width: 767px) 0px, 50vw"
+        alt="{{ img_alt | escape }}"
+        class="ds-clip-image"
+        loading="eager"
+        fetchpriority="high"
+        width="{{ img.width }}"
+        height="{{ img.height }}"
+      >
+    </div>
+  {%- endif -%}
+
+  <div class="ds-hero__inner">
+
+    {{- '<!-- Decorative cyan diagonal line -->' -}}
+    <div class="ds-hero__diagonal" aria-hidden="true"></div>
+
+    <div class="ds-hero__content">
+
+      <p class="ds-hero__eyebrow">DREAMSTATION ESPORTS</p>
+
+      <div class="ds-hero__chip">
+        {% render 'ds-performance-chip', variant: '', label: 'RLCS 2026 · APAC', sr_label: 'RLCS 2026 APAC Circuit' %}
+      </div>
+
+      <h1 class="ds-hero__headline">{{ heading | escape }}</h1>
+
+      <p class="ds-hero__subheading">{{ subheading | escape }}</p>
+
+      <div class="ds-hero__ctas">
+        {% render 'ds-cta-button', variant: 'primary', label: cta1_label, url: cta1_url %}
+        <span class="ds-hero__cta-ghost">
+          {% render 'ds-cta-button', variant: 'ghost', label: cta2_label, url: cta2_url %}
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "Hero",
+  "tag": "section",
+  "class": "ds-hero-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "WHERE AMBITION COMPETES."
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Elite competition. Standout moments. A brand that plays to be remembered."
+    },
+    {
+      "type": "image_picker",
+      "id": "player_image",
+      "label": "Player Image"
+    },
+    {
+      "type": "text",
+      "id": "player_image_alt",
+      "label": "Player Image Alt Text",
+      "default": "Dreamstation Esports player"
+    },
+    {
+      "type": "text",
+      "id": "cta_primary_label",
+      "label": "Primary CTA Label",
+      "default": "EXPLORE THE TEAM"
+    },
+    {
+      "type": "url",
+      "id": "cta_primary_url",
+      "label": "Primary CTA URL"
+    },
+    {
+      "type": "text",
+      "id": "cta_ghost_label",
+      "label": "Ghost CTA Label",
+      "default": "PARTNER WITH US"
+    },
+    {
+      "type": "url",
+      "id": "cta_ghost_url",
+      "label": "Ghost CTA URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero"
+    }
+  ]
+}
+{% endschema %}

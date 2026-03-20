@@ -1,0 +1,347 @@
+{% comment %}
+  Dreamstation Esports — Partners Page Section
+  sections/ds-partners-page.liquid · T24
+
+  Speed B throughout — NO exceptions:
+  - No .ds-surface grain (no ::after pseudo-element)
+  - No clip-path on section transitions (straight horizontal edges only)
+  - No radial glow backgrounds (flat --color-surface / --color-surface-container-low)
+  - Headlines 2–3rem
+  - border-radius: 0 everywhere
+
+  Rules enforced:
+  - border-radius: 0 everywhere
+  - No {% include %} — {% render %} only for snippets
+  - No inline <style> or <script> in Liquid
+  - No hardcoded partner data — dreamstation_partner metaobject only
+  - IntersectionObserver-driven animations via .ds-animate-in (dreamstation.js)
+  - Text colors: CSS variables only — never #fff or #000 literals
+  - Glow tokens only — no pixel-offset box-shadow
+  - One <h1> on page (in section 1 header)
+  - Heading hierarchy: h1 → h2 (no skips)
+  - All chips paired with .sr-only companion spans
+  - No role="banner" on any section header
+  - Every form field has a paired <label for="[id]">
+  - aria-required="true" on all required fields
+  - {% form 'contact' %} Liquid tag used — no raw <form> element
+{% endcomment %}
+
+{%- liquid
+  assign settings = shop.metaobjects.dreamstation_settings.values.first
+  assign partners = shop.metaobjects.dreamstation_partner.values | where: 'is_active', true | sort: 'display_order'
+  assign naming_rights_available = settings.naming_rights_available
+  assign partnership_email = settings.partnership_email | default: 'partners@dreamstationesports.com'
+-%}
+
+
+{%- comment -%} ═══════════════════════════════════════════════════════════
+  SECTION 1 — PAGE HEADER (Speed B)
+  Background: --color-surface-container-low
+  NO .ds-surface class (no grain pseudo-element)
+  NO clip-path (straight horizontal edges only)
+  NO radial gradient background
+  No role="banner" — belongs only on ds-nav.liquid
+═══════════════════════════════════════════════════════════ {%- endcomment -%}
+
+<header class="ds-partners-header" aria-labelledby="partners-page-heading">
+
+  <div class="ds-partners-header__inner">
+    <p class="ds-partners-header__sub-label">{{ section.settings.section_label | default: 'RLCS 2026 · APAC CIRCUIT' }}</p>
+    <h1 id="partners-page-heading" class="ds-partners-header__heading">PARTNER WITH DREAMSTATION</h1>
+  </div>
+
+</header>
+
+
+{%- comment -%} ═══════════════════════════════════════════════════════════
+  SECTION 2 — VALUE PROP PILLARS (Speed B)
+  Background: --color-surface (flat, no grain, no clip)
+  4 pillars: 2-col desktop / 1-col mobile
+  Naming rights pillar: conditional on naming_rights_available == true
+═══════════════════════════════════════════════════════════ {%- endcomment -%}
+
+<section class="ds-partners-pillars" aria-labelledby="pillars-heading">
+
+  <div class="ds-partners-pillars__inner">
+
+    <h2 id="pillars-heading" class="ds-partners-pillars__heading ds-animate-in">WHY DREAMSTATION</h2>
+
+    <div class="ds-partners-pillars__grid">
+
+      <article class="ds-partners-pillar ds-animate-in">
+        <p class="ds-partners-pillar__title">RLCS REGISTERED</p>
+        <p class="ds-partners-pillar__body">Active competitor in the RLCS 2026 APAC circuit. Verified team, verified results.</p>
+      </article>
+
+      <article class="ds-partners-pillar ds-animate-in">
+        <p class="ds-partners-pillar__title">ACTIVE APAC ROSTER</p>
+        <p class="ds-partners-pillar__body">4 players. 1 starting sub. Current season, current competition.</p>
+      </article>
+
+      <article class="ds-partners-pillar ds-animate-in">
+        <p class="ds-partners-pillar__title">CONTENT ECOSYSTEM</p>
+        <p class="ds-partners-pillar__body">Creator network active across YouTube and X. @DreamstationGG. Content that converts.</p>
+      </article>
+
+      {%- if naming_rights_available -%}
+        <article class="ds-partners-pillar ds-animate-in">
+          <div class="ds-partners-pillar__chip-row">
+            <span class="ds-chip ds-chip--live" aria-hidden="true">AVAILABLE</span>
+            <span class="sr-only">Currently available</span>
+          </div>
+          <p class="ds-partners-pillar__title">NAMING RIGHTS AVAILABLE</p>
+          <p class="ds-partners-pillar__body">Full naming rights on an RLCS 2026 APAC team. First mover advantage on a rising org.</p>
+        </article>
+      {%- endif -%}
+
+    </div>
+
+  </div>
+
+</section>
+
+
+{%- comment -%} ═══════════════════════════════════════════════════════════
+  SECTION 3 — PROOF ELEMENTS (Speed B)
+  Background: --color-surface-container-low (flat, no grain, no clip)
+  Hardcoded aggregate proof stats — not a Rule 7 violation
+  1,185 / 7× / $8,100+ are documented marketing aggregates, not live data
+═══════════════════════════════════════════════════════════ {%- endcomment -%}
+
+<section class="ds-partners-proof" aria-labelledby="proof-heading">
+
+  <div class="ds-partners-proof__inner">
+
+    <h2 id="proof-heading" class="ds-partners-proof__heading ds-animate-in">THE NUMBERS</h2>
+
+    <div class="ds-partners-proof__stats">
+
+      <div class="ds-partners-proof__stat ds-animate-in" aria-label="One thousand one hundred and eighty-five peak concurrent viewers at RLCS 2025 Raleigh Major">
+        <p class="ds-partners-proof__stat-number" aria-hidden="true">1,185</p>
+        <p class="ds-partners-proof__stat-label">PEAK CONCURRENT VIEWERS</p>
+        <p class="ds-partners-proof__stat-sub">RLCS 2025 Raleigh Major</p>
+      </div>
+
+      <div class="ds-partners-proof__stat ds-animate-in" aria-label="Seven championship wins since 2022">
+        <p class="ds-partners-proof__stat-number" aria-hidden="true">7&times;</p>
+        <p class="ds-partners-proof__stat-label">CHAMPIONSHIP WINS</p>
+        <p class="ds-partners-proof__stat-sub">Since 2022</p>
+      </div>
+
+      <div class="ds-partners-proof__stat ds-animate-in" aria-label="Over eight thousand one hundred dollars in documented earnings from RLCS APAC circuit">
+        <p class="ds-partners-proof__stat-number" aria-hidden="true">$8,100+</p>
+        <p class="ds-partners-proof__stat-label">DOCUMENTED EARNINGS</p>
+        <p class="ds-partners-proof__stat-sub">RLCS APAC circuit</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+{%- comment -%} ═══════════════════════════════════════════════════════════
+  SECTION 4 — CURRENT PARTNERS (Speed B)
+  Only renders when partners.size > 0
+  If no partners: skip entirely — no empty grid, no placeholder logos
+  Partner link: <a> if website_url present, <span> if not
+═══════════════════════════════════════════════════════════ {%- endcomment -%}
+
+{%- if partners.size > 0 -%}
+
+  <section class="ds-partners-bar" aria-labelledby="partners-bar-heading">
+
+    <div class="ds-partners-bar__inner">
+
+      <h2 id="partners-bar-heading" class="ds-partners-bar__heading ds-animate-in">OUR PARTNERS</h2>
+
+      <div class="ds-sponsor-bar ds-animate-in">
+
+        {%- for partner in partners -%}
+          {%- if partner.website_url != blank -%}
+            <a
+              href="{{ partner.website_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="{{ partner.partner_name }} (opens in new tab)"
+              class="ds-sponsor-bar__link"
+            >
+              {{ partner.logo | image_url: width: 200 | image_tag: alt: partner.partner_name, class: 'ds-sponsor-bar__logo', loading: 'lazy' }}
+            </a>
+          {%- else -%}
+            <span class="ds-sponsor-bar__link ds-sponsor-bar__link--no-url">
+              {{ partner.logo | image_url: width: 200 | image_tag: alt: partner.partner_name, class: 'ds-sponsor-bar__logo', loading: 'lazy' }}
+            </span>
+          {%- endif -%}
+        {%- endfor -%}
+
+      </div>
+
+    </div>
+
+  </section>
+
+{%- endif -%}
+
+
+{%- comment -%} ═══════════════════════════════════════════════════════════
+  SECTION 5 — CONTACT FORM (Speed B) — CRITICAL SECTION
+  Background: --color-surface (flat, no grain, no clip)
+  {% form 'contact' %} Liquid tag — generates <form>, action, method, CSRF token
+  Every field has a paired <label for="[id]"> (Rule 13)
+  aria-required="true" on all required fields
+  Required field visual indicator: aria-hidden="true" + .sr-only companion
+  Select: .ds-input class with appearance: none
+  Textarea: .ds-input class with resize: vertical; min-height: 140px
+  All field IDs prefixed with "partners-" — no conflicts with nav search inputs
+═══════════════════════════════════════════════════════════ {%- endcomment -%}
+
+<section class="ds-partners-contact" aria-labelledby="contact-heading">
+
+  <div class="ds-partners-contact__inner">
+
+    <div class="ds-partners-contact__intro ds-animate-in">
+      <h2 id="contact-heading" class="ds-partners-contact__heading">START THE CONVERSATION</h2>
+      <p class="ds-partners-contact__sub">{{ section.settings.response_time | default: 'We respond within 48 hours.' }} Partnership inquiries go directly to the Dreamstation team.</p>
+
+      <div class="ds-partners-contact__info-row">
+        <a
+          href="mailto:{{ partnership_email }}"
+          class="ds-partners-contact__email-link"
+          aria-label="Email {{ partnership_email }}"
+        >{{ partnership_email }}</a>
+        <span class="ds-partners-contact__divider" aria-hidden="true">&middot;</span>
+        <span class="ds-partners-contact__social">@DreamstationGG</span>
+      </div>
+    </div>
+
+    <div class="ds-partners-contact__form-wrap ds-animate-in">
+
+      {%- form 'contact', id: 'partners-form', class: 'ds-partners-form' -%}
+
+        <div class="ds-field">
+          <label class="ds-label" for="partners-name">
+            Name
+            <span class="ds-field__required" aria-hidden="true">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <input
+            class="ds-input"
+            type="text"
+            id="partners-name"
+            name="contact[name]"
+            autocomplete="name"
+            aria-required="true"
+            required
+            placeholder="Your name"
+          >
+        </div>
+
+        <div class="ds-field">
+          <label class="ds-label" for="partners-org">Organisation</label>
+          <input
+            class="ds-input"
+            type="text"
+            id="partners-org"
+            name="contact[organisation]"
+            autocomplete="organization"
+            placeholder="Company or brand name"
+          >
+        </div>
+
+        <div class="ds-field">
+          <label class="ds-label" for="partners-email">
+            Email
+            <span class="ds-field__required" aria-hidden="true">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <input
+            class="ds-input"
+            type="email"
+            id="partners-email"
+            name="contact[email]"
+            autocomplete="email"
+            aria-required="true"
+            required
+            placeholder="your@email.com"
+          >
+        </div>
+
+        <div class="ds-field">
+          <label class="ds-label" for="partners-budget">
+            Partnership Budget
+            <span class="ds-field__required" aria-hidden="true">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <select
+            class="ds-input ds-input--select"
+            id="partners-budget"
+            name="contact[budget]"
+            aria-required="true"
+            required
+          >
+            <option value="" disabled selected>Select a range</option>
+            <option value="under-5k">Under $5,000</option>
+            <option value="5k-15k">$5,000 &ndash; $15,000</option>
+            <option value="15k-50k">$15,000 &ndash; $50,000</option>
+            <option value="50k-plus">$50,000+</option>
+            <option value="naming-rights">Naming Rights (open to discuss)</option>
+          </select>
+        </div>
+
+        <div class="ds-field">
+          <label class="ds-label" for="partners-message">
+            Message
+            <span class="ds-field__required" aria-hidden="true">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <textarea
+            class="ds-input ds-input--textarea"
+            id="partners-message"
+            name="contact[body]"
+            aria-required="true"
+            required
+            placeholder="Tell us about your brand and your partnership goals."
+          ></textarea>
+        </div>
+
+        <button
+          type="submit"
+          class="ds-btn-primary ds-partners-form__submit"
+          aria-busy="false"
+        >START THE CONVERSATION</button>
+
+      {%- endform -%}
+
+    </div>
+
+  </div>
+
+</section>
+
+
+{% schema %}
+{
+  "name": "Partners Page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_label",
+      "label": "Sub-label",
+      "default": "RLCS 2026 · APAC CIRCUIT"
+    },
+    {
+      "type": "text",
+      "id": "response_time",
+      "label": "Response time note",
+      "default": "We respond within 48 hours."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Partners Page"
+    }
+  ]
+}
+{% endschema %}

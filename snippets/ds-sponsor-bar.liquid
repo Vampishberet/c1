@@ -1,0 +1,62 @@
+{% comment %}
+  Dreamstation Esports — Sponsor Logo Bar
+  snippets/ds-sponsor-bar.liquid
+
+  Usage: {% render 'ds-sponsor-bar' %}
+
+  Rules:
+  - Two mutually exclusive states — NEVER show both, NEVER show empty grid
+  - State 1: Active partners exist → render logo bar
+  - State 2: No active partners → render CTA fallback block
+  - Logos: brightness(0) invert(1) at 0.5 opacity, 1.0 on hover
+  - Partners sorted by display_order (lower = first)
+  - All CSS in dreamstation.css (.ds-sponsor-bar, .ds-sponsor-cta)
+  - No border-radius. No inline styles except where required.
+  - alt text: partner name (not decorative — logos are informational)
+{% endcomment %}
+
+{%- assign active_partners = shop.metaobjects.dreamstation_partner.values | where: 'is_active', true -%}
+{%- assign sorted_partners = active_partners | sort: 'display_order' -%}
+
+{%- if sorted_partners.size > 0 -%}
+
+  {%- comment -%} STATE 1: Logo bar {%- endcomment -%}
+  <div class="ds-sponsor-bar" role="list" aria-label="Our partners">
+    {%- for partner in sorted_partners -%}
+      {%- if partner.logo != blank -%}
+        <div role="listitem">
+          {%- if partner.website_url != blank -%}
+            <a href="{{ partner.website_url }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="{{ partner.partner_name }}">
+              {{ partner.logo | image_url: width: 300 | image_tag:
+                  alt: partner.partner_name,
+                  class: 'ds-sponsor-bar__logo',
+                  loading: 'lazy',
+                  width: 200 }}
+            </a>
+          {%- else -%}
+            {{ partner.logo | image_url: width: 300 | image_tag:
+                alt: partner.partner_name,
+                class: 'ds-sponsor-bar__logo',
+                loading: 'lazy',
+                width: 200 }}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+{%- else -%}
+
+  {%- comment -%} STATE 2: CTA fallback — no empty logo placeholders {%- endcomment -%}
+  <div class="ds-sponsor-cta">
+    <h2 class="ds-sponsor-cta__heading">PARTNER WITH DREAMSTATION</h2>
+    <p class="ds-sponsor-cta__body">
+      Naming rights available for the RLCS 2026 APAC roster. Join the station.
+    </p>
+    <a href="/pages/partners" class="ds-btn-primary">START THE CONVERSATION</a>
+  </div>
+
+{%- endif -%}

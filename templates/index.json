@@ -1,0 +1,41 @@
+{
+  "sections": {
+    "ds-ticker": {
+      "type": "ds-ticker",
+      "settings": {}
+    },
+    "ds-hero": {
+      "type": "ds-hero",
+      "settings": {}
+    },
+    "ds-roster-preview": {
+      "type": "ds-roster-preview",
+      "settings": {}
+    },
+    "ds-results-preview": {
+      "type": "ds-results-preview",
+      "settings": {}
+    },
+    "ds-content-proof": {
+      "type": "ds-content-proof",
+      "settings": {}
+    },
+    "ds-sponsor-signal": {
+      "type": "ds-sponsor-signal",
+      "settings": {}
+    },
+    "ds-merch-entry": {
+      "type": "ds-merch-entry",
+      "settings": {}
+    }
+  },
+  "order": [
+    "ds-hero",
+    "ds-ticker",
+    "ds-roster-preview",
+    "ds-results-preview",
+    "ds-content-proof",
+    "ds-sponsor-signal",
+    "ds-merch-entry"
+  ]
+}

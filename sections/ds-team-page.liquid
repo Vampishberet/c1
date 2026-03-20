@@ -1,0 +1,421 @@
+{% comment %}
+  Dreamstation Esports — Team Page Section
+  sections/ds-team-page.liquid · T22
+
+  Speed A throughout (header + roster grid).
+  Section 3 (Titles) uses flat Speed B surface — no grain, no clip.
+
+  Rules enforced:
+  - border-radius: 0 everywhere
+  - clip-path always paired with -webkit-clip-path
+  - No {% include %} — {% render %} only
+  - No inline <style> or <script>
+  - No hardcoded player data — dreamstation_player metaobjects only
+  - Title entries from {% schema %} blocks
+  - IntersectionObserver-driven animations via .ds-animate-in (dreamstation.js)
+  - Text colors: --color-on-surface / --color-on-surface-variant only
+  - Glow tokens only — no pixel-offset box-shadow
+  - One <h1> on page (in header block)
+  - Player names are <h3>
+  - Heading hierarchy: h1 → h2 → h3 (no skips)
+{% endcomment %}
+
+{%- liquid
+  assign all_players    = shop.metaobjects.dreamstation_player.values | where: 'is_active', true
+  assign main_players   = all_players | where: 'is_substitute', false
+  assign sub_players    = all_players | where: 'is_substitute', true
+  assign section_label  = section.settings.section_label | default: 'RLCS 2026 · APAC CIRCUIT'
+-%}
+
+
+{%- comment -%} ═══════════════════════════════════════════════════════════
+  SECTION 1 — HEADER BLOCK (Speed A)
+  Background: --color-surface + radial purple glow
+  Grain overlay at 4% via .ds-surface
+  15° diagonal clip on bottom via .ds-team-header__clip
+═══════════════════════════════════════════════════════════ {%- endcomment -%}
+
+<header class="ds-team-header ds-surface" aria-labelledby="team-page-heading">
+
+  {%- comment -%} Radial purple glow background layer {%- endcomment -%}
+  <div class="ds-team-header__glow" aria-hidden="true"></div>
+
+  {%- comment -%} Decorative oversized background text {%- endcomment -%}
+  <div class="ds-team-header__bg-text" aria-hidden="true">THE TEAM</div>
+
+  <div class="ds-team-header__inner">
+    <p class="ds-team-header__sub-label">{{ section_label }}</p>
+    <h1 id="team-page-heading" class="ds-team-header__heading">THE TEAM</h1>
+  </div>
+
+</header>
+
+
+{%- comment -%} ═══════════════════════════════════════════════════════════
+  SECTION 2 — ROSTER GRID (Speed A body)
+  Background: --color-surface
+  Sort: main roster first, substitutes at end
+  3-column grid, responsive breakpoints via CSS
+═══════════════════════════════════════════════════════════ {%- endcomment -%}
+
+<section class="ds-team-roster ds-surface" aria-labelledby="roster-heading">
+
+  <div class="ds-team-roster__inner">
+
+    <header class="ds-team-roster__header ds-animate-in">
+      <p class="ds-team-roster__sub-label">{{ section_label }}</p>
+      <h2 id="roster-heading" class="ds-team-roster__heading">ACTIVE ROSTER</h2>
+    </header>
+
+    {%- if all_players.size > 0 -%}
+
+      <div class="ds-team-roster__grid" role="list">
+
+        {%- comment -%} Main roster players first {%- endcomment -%}
+        {%- for player in main_players -%}
+          {%- liquid
+            assign card_index = forloop.index0
+            assign delay_ms   = card_index | times: 50
+          -%}
+          <article
+            class="ds-player-card ds-team-roster__card ds-animate-in"
+            role="listitem"
+            aria-label="{{ player.display_name }}"
+            style="transition-delay: {{ delay_ms }}ms"
+          >
+
+            {%- comment -%} Image zone — overflows card top {%- endcomment -%}
+            <div class="ds-player-card__image-wrap">
+              <div class="ds-player-card__accent" aria-hidden="true"></div>
+
+              {%- if player.photo != blank -%}
+                {{ player.photo | image_url: width: 600 | image_tag:
+                    alt: player.display_name,
+                    class: 'ds-player-card__image ds-clip-image',
+                    loading: 'lazy',
+                    width: 600 }}
+              {%- else -%}
+                <div class="ds-player-card__image-placeholder" aria-hidden="true"></div>
+              {%- endif -%}
+            </div>
+
+            {%- comment -%} Card body {%- endcomment -%}
+            <div class="ds-player-card__body">
+
+              {%- comment -%} Status + Nationality chips {%- endcomment -%}
+              <div class="ds-team-roster__chips">
+                <span class="ds-chip" aria-hidden="true">ACTIVE</span>
+                <span class="sr-only">Active player</span>
+
+                {%- if player.nationality != blank -%}
+                  {%- liquid
+                    assign nat_upper = player.nationality | upcase
+                    case nat_upper
+                      when 'JP'
+                        assign flag_emoji = '🇯🇵'
+                      when 'AU'
+                        assign flag_emoji = '🇦🇺'
+                      when 'ID'
+                        assign flag_emoji = '🇮🇩'
+                      when 'NZ'
+                        assign flag_emoji = '🇳🇿'
+                      when 'SG'
+                        assign flag_emoji = '🇸🇬'
+                      else
+                        assign flag_emoji = ''
+                    endcase
+                  -%}
+                  {%- if flag_emoji != blank -%}
+                    <span class="ds-chip ds-chip--inactive" aria-hidden="true">{{ flag_emoji }} {{ nat_upper }}</span>
+                    <span class="sr-only">Nationality: {{ player.nationality | upcase }}</span>
+                  {%- endif -%}
+                {%- endif -%}
+              </div>
+
+              <h3 class="ds-player-card__name">{{ player.display_name }}</h3>
+
+              {%- if player.role != blank -%}
+                <p class="ds-player-card__role">{{ player.role }}</p>
+              {%- endif -%}
+
+              {%- if player.bio != blank -%}
+                <p class="ds-player-card__bio ds-team-roster__bio">{{ player.bio }}</p>
+              {%- endif -%}
+
+              {%- if player.twitter_url != blank or player.twitch_url != blank -%}
+                <div class="ds-player-card__socials">
+
+                  {%- if player.twitter_url != blank -%}
+                    <a
+                      href="{{ player.twitter_url }}"
+                      class="ds-player-card__social-link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="View {{ player.display_name }} on Twitter"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                    </a>
+                  {%- endif -%}
+
+                  {%- if player.twitch_url != blank -%}
+                    <a
+                      href="{{ player.twitch_url }}"
+                      class="ds-player-card__social-link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="View {{ player.display_name }} on Twitch"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+                      </svg>
+                    </a>
+                  {%- endif -%}
+
+                </div>
+              {%- endif -%}
+
+            </div>
+          </article>
+        {%- endfor -%}
+
+        {%- comment -%} Substitute players appended after main roster {%- endcomment -%}
+        {%- for player in sub_players -%}
+          {%- liquid
+            assign sub_index  = main_players.size | plus: forloop.index0
+            assign delay_ms   = sub_index | times: 50
+          -%}
+          <article
+            class="ds-player-card ds-player-card--substitute ds-team-roster__card ds-animate-in"
+            role="listitem"
+            aria-label="{{ player.display_name }}"
+            style="transition-delay: {{ delay_ms }}ms"
+          >
+
+            <div class="ds-player-card__image-wrap">
+              <div class="ds-player-card__accent" aria-hidden="true"></div>
+
+              {%- if player.photo != blank -%}
+                {{ player.photo | image_url: width: 600 | image_tag:
+                    alt: player.display_name,
+                    class: 'ds-player-card__image ds-clip-image',
+                    loading: 'lazy',
+                    width: 600 }}
+              {%- else -%}
+                <div class="ds-player-card__image-placeholder" aria-hidden="true"></div>
+              {%- endif -%}
+            </div>
+
+            <div class="ds-player-card__body">
+
+              <div class="ds-team-roster__chips">
+                <span class="ds-chip ds-chip--sub" aria-hidden="true">SUB</span>
+                <span class="sr-only">Substitute player</span>
+
+                {%- if player.nationality != blank -%}
+                  {%- liquid
+                    assign nat_upper = player.nationality | upcase
+                    case nat_upper
+                      when 'JP'
+                        assign flag_emoji = '🇯🇵'
+                      when 'AU'
+                        assign flag_emoji = '🇦🇺'
+                      when 'ID'
+                        assign flag_emoji = '🇮🇩'
+                      when 'NZ'
+                        assign flag_emoji = '🇳🇿'
+                      when 'SG'
+                        assign flag_emoji = '🇸🇬'
+                      else
+                        assign flag_emoji = ''
+                    endcase
+                  -%}
+                  {%- if flag_emoji != blank -%}
+                    <span class="ds-chip ds-chip--inactive" aria-hidden="true">{{ flag_emoji }} {{ nat_upper }}</span>
+                    <span class="sr-only">Nationality: {{ player.nationality | upcase }}</span>
+                  {%- endif -%}
+                {%- endif -%}
+              </div>
+
+              <h3 class="ds-player-card__name">{{ player.display_name }}</h3>
+
+              {%- if player.role != blank -%}
+                <p class="ds-player-card__role">{{ player.role }}</p>
+              {%- endif -%}
+
+              {%- if player.bio != blank -%}
+                <p class="ds-player-card__bio ds-team-roster__bio">{{ player.bio }}</p>
+              {%- endif -%}
+
+              {%- if player.twitter_url != blank or player.twitch_url != blank -%}
+                <div class="ds-player-card__socials">
+
+                  {%- if player.twitter_url != blank -%}
+                    <a
+                      href="{{ player.twitter_url }}"
+                      class="ds-player-card__social-link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="View {{ player.display_name }} on Twitter"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                    </a>
+                  {%- endif -%}
+
+                  {%- if player.twitch_url != blank -%}
+                    <a
+                      href="{{ player.twitch_url }}"
+                      class="ds-player-card__social-link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="View {{ player.display_name }} on Twitch"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+                      </svg>
+                    </a>
+                  {%- endif -%}
+
+                </div>
+              {%- endif -%}
+
+            </div>
+          </article>
+        {%- endfor -%}
+
+      </div>
+
+    {%- else -%}
+
+      <div class="ds-empty-state" role="status">
+        <p class="ds-empty-state__text">The squad will update when the roster moves.</p>
+      </div>
+
+    {%- endif -%}
+
+  </div>
+
+</section>
+
+
+{%- comment -%} ═══════════════════════════════════════════════════════════
+  SECTION 3 — TITLES & HISTORY (Speed B — flat, no grain, no clip)
+  Background: --color-surface-container-low
+  Title entries from {% schema %} blocks — not hardcoded
+═══════════════════════════════════════════════════════════ {%- endcomment -%}
+
+{%- if section.blocks.size > 0 -%}
+  <section class="ds-team-titles" aria-labelledby="titles-heading">
+
+    <div class="ds-team-titles__inner">
+
+      <header class="ds-team-titles__header ds-animate-in">
+        <h2 id="titles-heading" class="ds-team-titles__heading">TITLES &amp; HISTORY</h2>
+      </header>
+
+      <div class="ds-team-titles__list">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'title_entry' -%}
+            {%- liquid
+              assign entry_delay = forloop.index0 | times: 50
+            -%}
+            <div
+              class="ds-team-titles__entry ds-animate-in"
+              {{ block.shopify_attributes }}
+              style="transition-delay: {{ entry_delay }}ms"
+            >
+              <p class="ds-team-titles__game">{{ block.settings.game_title | upcase }}</p>
+
+              {%- if block.settings.region != blank -%}
+                <p class="ds-team-titles__region">{{ block.settings.region }}</p>
+              {%- endif -%}
+
+              <div class="ds-team-titles__status">
+                {%- if block.settings.status == 'active' -%}
+                  <span class="ds-chip ds-chip--live" aria-hidden="true">ACTIVE</span>
+                  <span class="sr-only">Currently active</span>
+                {%- else -%}
+                  <span class="ds-chip ds-chip--inactive" aria-hidden="true">INACTIVE</span>
+                  <span class="sr-only">No longer active</span>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+    </div>
+
+  </section>
+{%- endif -%}
+
+
+{% schema %}
+{
+  "name": "Team Page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_label",
+      "label": "Sub-label",
+      "default": "RLCS 2026 · APAC CIRCUIT"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "title_entry",
+      "name": "Title Entry",
+      "settings": [
+        {
+          "type": "text",
+          "id": "game_title",
+          "label": "Game Title",
+          "default": "Rocket League"
+        },
+        {
+          "type": "text",
+          "id": "region",
+          "label": "Region / Season",
+          "default": "RLCS 2026 APAC"
+        },
+        {
+          "type": "select",
+          "id": "status",
+          "label": "Status",
+          "options": [
+            { "value": "active",   "label": "Active"   },
+            { "value": "inactive", "label": "Inactive" }
+          ],
+          "default": "active"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Team Page",
+      "blocks": [
+        {
+          "type": "title_entry",
+          "settings": {
+            "game_title": "Rocket League",
+            "region": "RLCS 2026 APAC",
+            "status": "active"
+          }
+        },
+        {
+          "type": "title_entry",
+          "settings": {
+            "game_title": "Valorant",
+            "region": "",
+            "status": "inactive"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

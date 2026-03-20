@@ -1,0 +1,145 @@
+{% comment %}
+  Dreamstation Esports — Merch Entry Section
+  sections/ds-merch-entry.liquid
+
+  Speed B: no .ds-surface grain, no clip-path on section edges, flat horizontal edges.
+  Products selected via Customizer (product_list, max 3).
+  AJAX add-to-cart handled by delegated listener in assets/dreamstation.js.
+{% endcomment %}
+
+<section class="ds-merch-entry" aria-labelledby="ds-merch-entry-heading">
+  <div class="ds-merch-entry__inner">
+
+    {%- comment -%} ── Section header ── {%- endcomment -%}
+    <header class="ds-merch-entry__header">
+      <p class="ds-merch-entry__sublabel" aria-hidden="true">
+        {{- section.settings.sub_label | default: 'OFFICIAL MERCH' -}}
+      </p>
+      <span class="sr-only">{{ section.settings.sub_label | default: 'Official Merch' }}</span>
+      <h2 class="ds-merch-entry__heading" id="ds-merch-entry-heading">
+        {{- section.settings.heading | default: 'WEAR THE STATION' -}}
+      </h2>
+    </header>
+
+    {%- comment -%} ── Product grid ── {%- endcomment -%}
+    {%- if section.settings.products != blank and section.settings.products.count > 0 -%}
+      <div class="ds-merch-entry__grid" role="list">
+        {%- assign stagger_base = 0 -%}
+        {%- for product in section.settings.products -%}
+          {%- assign stagger_delay = stagger_base | plus: 0 -%}
+          {%- if forloop.index == 2 -%}
+            {%- assign stagger_delay = 100 -%}
+          {%- elsif forloop.index == 3 -%}
+            {%- assign stagger_delay = 200 -%}
+          {%- endif -%}
+
+          {%- comment -%} Determine button state: single available variant vs. multiple or unavailable {%- endcomment -%}
+          {%- assign show_atc = false -%}
+          {%- if product.variants.size == 1 and product.variants.first.available -%}
+            {%- assign show_atc = true -%}
+          {%- endif -%}
+
+          <article class="ds-merch-entry__tile ds-animate-in" role="listitem" style="transition-delay: {{ stagger_delay }}ms;">
+
+            {%- comment -%} Product image ── {%- endcomment -%}
+            <a
+              href="{{ product.url }}"
+              class="ds-merch-entry__tile-image-link"
+              aria-label="{{ product.title }}"
+            >
+              {%- if product.featured_image != blank -%}
+                {{ product.featured_image | image_url: width: 600 | image_tag:
+                    alt: product.title,
+                    class: 'ds-merch-entry__tile-img',
+                    loading: 'lazy',
+                    width: 600,
+                    height: 600
+                }}
+              {%- else -%}
+                <div class="ds-merch-entry__tile-img-placeholder" aria-hidden="true"></div>
+              {%- endif -%}
+            </a>
+
+            {%- comment -%} Tile body ── {%- endcomment -%}
+            <div class="ds-merch-entry__tile-body">
+              <h3 class="ds-merch-entry__tile-title">{{ product.title }}</h3>
+              <p class="ds-merch-entry__tile-price">{{ product.price | money }}</p>
+
+              {%- if show_atc -%}
+                <button
+                  type="button"
+                  class="ds-btn-primary ds-merch-entry__tile-atc"
+                  data-variant-id="{{ product.variants.first.id }}"
+                  data-product-id="{{ product.id }}"
+                  aria-label="Add {{ product.title }} to cart"
+                >ADD TO CART</button>
+              {%- else -%}
+                <a
+                  href="{{ product.url }}"
+                  class="ds-btn-ghost ds-merch-entry__tile-view"
+                  aria-label="View product: {{ product.title }}"
+                >VIEW PRODUCT</a>
+              {%- endif -%}
+            </div>
+
+          </article>
+        {%- endfor -%}
+      </div>
+
+    {%- else -%}
+      {%- comment -%} ── Empty state ── {%- endcomment -%}
+      <div class="ds-merch-entry__empty">
+        <p class="ds-merch-entry__empty-text">Stock rotating. <a href="{{ routes.all_products_collection_url }}" class="ds-merch-entry__empty-link">View the full collection.</a></p>
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} ── Footer CTA ── {%- endcomment -%}
+    <div class="ds-merch-entry__footer">
+      {% render 'ds-cta-button',
+        variant: 'ghost',
+        label: section.settings.cta_label,
+        url: routes.all_products_collection_url
+      %}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Merch Entry",
+  "tag": "section",
+  "class": "ds-merch-entry-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "WEAR THE STATION"
+    },
+    {
+      "type": "text",
+      "id": "sub_label",
+      "label": "Sub Label",
+      "default": "OFFICIAL MERCH"
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Products",
+      "limit": 3
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA Button Label",
+      "default": "SHOP ALL →"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Merch Entry"
+    }
+  ]
+}
+{% endschema %}

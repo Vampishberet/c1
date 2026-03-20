@@ -1,0 +1,26 @@
+{% comment %}
+  Dreamstation Esports — Section Divider
+  snippets/ds-section-divider.liquid
+
+  Usage:
+    {% render 'ds-section-divider', variant: 'bottom' %}
+    {% render 'ds-section-divider', variant: 'top' %}
+    {% render 'ds-section-divider', variant: 'none' %}
+
+  Variants:
+    'bottom' — Speed A: raises bottom-left corner, forward lean
+    'top'    — Speed A: raises top-right corner, incoming section
+    'none'   — Speed B: no clip, renders nothing (straight horizontal edges)
+
+  Rules:
+  - clip-path used only. NEVER skewY() or skewX().
+  - Always -webkit-clip-path alongside clip-path (CSS handles this).
+  - Speed A only — do NOT use on About / Contact / Partners / Shop / 404.
+  - aria-hidden="true" always — decorative only.
+{% endcomment %}
+
+{%- if variant == 'bottom' -%}
+  <div class="ds-section-divider ds-clip-bottom" aria-hidden="true"></div>
+{%- elsif variant == 'top' -%}
+  <div class="ds-section-divider ds-clip-top" aria-hidden="true"></div>
+{%- endif -%}

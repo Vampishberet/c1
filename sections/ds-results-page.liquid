@@ -1,0 +1,361 @@
+{% comment %}
+  Dreamstation Esports — Results Page Section
+  sections/ds-results-page.liquid · T23
+
+  Split speed:
+  - SECTION 1 (header): Speed A — grain via .ds-surface, radial glow, ds-clip-bottom diagonal.
+  - SECTIONS 2–4 (body): Speed B — flat surface, no grain, no clip-path splits.
+
+  Rules enforced:
+  - border-radius: 0 everywhere
+  - clip-path always paired with -webkit-clip-path; no skewY/skewX
+  - No {% include %} — {% render %} only for snippets
+  - No inline <style> or <script> in Liquid
+  - No hardcoded result data — dreamstation_result metaobjects only
+  - Pull-quote stat ($8,100+) is aggregate marketing copy — not Rule 7 data
+  - IntersectionObserver-driven animations via .ds-animate-in (dreamstation.js)
+  - Tab filter and sort toggle: click events only — no scroll listeners
+  - Text colors: CSS variables only — never #fff or #000 literals
+  - Glow tokens only — no pixel-offset box-shadow
+  - One <h1> on page (in header block)
+  - Heading hierarchy: h1 → h2 (no skips)
+  - All chips paired with .sr-only companion spans
+  - No role="banner" on section header
+{% endcomment %}
+
+{%- liquid
+  assign all_results     = shop.metaobjects.dreamstation_result.values | sort: 'event_date' | reverse
+  assign featured_results = all_results | where: 'is_featured', true
+  assign section_label   = section.settings.section_label | default: 'RLCS 2026 · APAC CIRCUIT'
+
+  comment
+    Build year list for filter tabs — no hardcoded years
+  endcomment
+  assign seen_years = ''
+  for result in all_results
+    assign yr = result.event_date | date: '%Y'
+    unless seen_years contains yr
+      assign seen_years = seen_years | append: yr | append: '|'
+    endunless
+  endfor
+  assign year_list = seen_years | split: '|' | compact
+-%}
+
+
+{%- comment -%} ═══════════════════════════════════════════════════════════
+  SECTION 1 — HEADER BLOCK (Speed A)
+  Background: --color-surface + radial purple glow
+  Grain overlay at 4% via .ds-surface::after
+  15° diagonal clip on bottom via .ds-clip-bottom
+  No role="banner" — that belongs only on ds-nav.liquid
+═══════════════════════════════════════════════════════════ {%- endcomment -%}
+
+<header class="ds-results-header ds-surface ds-clip-bottom" aria-labelledby="results-page-heading">
+
+  {%- comment -%} Radial purple glow background layer {%- endcomment -%}
+  <div class="ds-results-header__glow" aria-hidden="true"></div>
+
+  {%- comment -%} Decorative oversized background text — purely visual {%- endcomment -%}
+  <div class="ds-results-header__bg-text" aria-hidden="true">RECORD</div>
+
+  <div class="ds-results-header__inner">
+    <p class="ds-results-header__sub-label">{{ section_label }}</p>
+    <h1 id="results-page-heading" class="ds-results-header__heading">COMPETITIVE RECORD</h1>
+  </div>
+
+</header>
+
+
+{%- comment -%} ═══════════════════════════════════════════════════════════
+  SECTION 2 — FEATURED ACHIEVEMENT TILES (Speed B)
+  Background: --color-surface (flat, no grain, no clip-path)
+  Grid: 3-col desktop → 2-col tablet → 1-col mobile
+  Data: featured_results (is_featured = true), max 3
+  Fallback: if fewer than 3 featured, render all available;
+            if 0 featured, show first 3 from all_results
+═══════════════════════════════════════════════════════════ {%- endcomment -%}
+
+{%- liquid
+  if featured_results.size > 0
+    assign display_results = featured_results | slice: 0, 3
+  else
+    assign display_results = all_results | slice: 0, 3
+  endif
+-%}
+
+<section class="ds-results-featured" aria-labelledby="featured-heading">
+
+  <div class="ds-results-featured__inner">
+
+    <header class="ds-results-featured__header ds-animate-in">
+      <p class="ds-results-featured__sub-label">{{ section_label }}</p>
+      <h2 id="featured-heading" class="ds-results-featured__heading">{{ section.settings.featured_heading | default: 'FEATURED RESULTS' }}</h2>
+    </header>
+
+    {%- if display_results.size > 0 -%}
+
+      <div class="ds-results-featured__grid" role="list">
+
+        {%- for result in display_results -%}
+          {%- liquid
+            assign tile_delay = forloop.index0 | times: 80
+          -%}
+          <article
+            class="ds-result-tile ds-animate-in"
+            role="listitem"
+            aria-label="{{ result.event_name }}"
+            style="transition-delay: {{ tile_delay }}ms"
+          >
+
+            <div class="ds-result-tile__placement-wrap" aria-hidden="true">
+              <span class="ds-result-tile__placement">{{ result.placement }}</span>
+            </div>
+
+            <div class="ds-result-tile__body">
+
+              <p class="ds-result-tile__event-name">{{ result.event_name | upcase }}</p>
+
+              <p class="ds-result-tile__meta">
+                {%- if result.region != blank -%}{{ result.region }}{%- endif -%}
+                {%- if result.region != blank and result.game_title != blank -%} · {%- endif -%}
+                {%- if result.game_title != blank -%}{{ result.game_title }}{%- endif -%}
+                {%- if result.season != blank -%} · {{ result.season }}{%- endif -%}
+              </p>
+
+              <p class="ds-result-tile__date">{{ result.event_date | date: '%b %Y' }}</p>
+
+              {%- if result.prize_usd != blank -%}
+                <p class="ds-result-tile__prize">${{ result.prize_usd }}</p>
+              {%- endif -%}
+
+            </div>
+
+            {%- if result.external_link != blank -%}
+              <div class="ds-result-tile__footer">
+                <a
+                  href="{{ result.external_link }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="ds-result-tile__link ds-btn-ghost"
+                  aria-label="View {{ result.event_name }} on Liquipedia (opens in new tab)"
+                >VIEW RESULT</a>
+              </div>
+            {%- endif -%}
+
+          </article>
+        {%- endfor -%}
+
+      </div>
+
+    {%- else -%}
+
+      <div class="ds-empty-state" role="status">
+        <p class="ds-empty-state__text">No results on record yet. Standards stay high.</p>
+      </div>
+
+    {%- endif -%}
+
+  </div>
+
+</section>
+
+
+{%- comment -%} ═══════════════════════════════════════════════════════════
+  SECTION 3 — PULL-QUOTE STAT (Speed B)
+  Background: --color-surface-container-low (flat, no grain, no clip)
+  Hardcoded aggregate marketing copy — not a Rule 7 violation
+  $8,100+ is a documented marketing aggregate, not live results data
+═══════════════════════════════════════════════════════════ {%- endcomment -%}
+
+<section class="ds-results-pullquote" aria-label="Prize earnings summary">
+
+  <div class="ds-results-pullquote__inner ds-animate-in">
+    <p class="ds-results-pullquote__stat" aria-label="Over eight thousand one hundred dollars in documented prize earnings">$8,100+</p>
+    <p class="ds-results-pullquote__label">DOCUMENTED PRIZE EARNINGS</p>
+    <p class="ds-results-pullquote__support">Across RLCS APAC circuit competition since 2022.</p>
+  </div>
+
+</section>
+
+
+{%- comment -%} ═══════════════════════════════════════════════════════════
+  SECTION 4 — FULL RESULTS TABLE (Speed B)
+  Background: --color-surface (flat, no grain, no clip)
+  Year filter tabs driven by Liquid loop — no hardcoded years
+  Sort toggle: click-based, JS handles DOM reorder
+  Ghost border (1px solid rgba(255,255,255,0.15)) permitted on th/td only
+═══════════════════════════════════════════════════════════ {%- endcomment -%}
+
+<section class="ds-results-table-section" aria-labelledby="table-heading">
+
+  <div class="ds-results-table-section__inner">
+
+    <header class="ds-results-table-section__header ds-animate-in">
+      <h2 id="table-heading" class="ds-results-table-section__heading">{{ section.settings.table_heading | default: 'FULL RECORD' }}</h2>
+    </header>
+
+    {%- comment -%} Year filter tabs — years extracted from live metaobject data {%- endcomment -%}
+    <div class="ds-results-table-section__controls">
+
+      <div class="ds-results-tabs" role="tablist" aria-label="Filter results by year">
+
+        <button
+          class="ds-results-tabs__tab is-active"
+          role="tab"
+          aria-selected="true"
+          data-filter-year="all"
+          aria-controls="results-tbody"
+        >ALL</button>
+
+        {%- for yr in year_list -%}
+          <button
+            class="ds-results-tabs__tab"
+            role="tab"
+            aria-selected="false"
+            data-filter-year="{{ yr }}"
+            aria-controls="results-tbody"
+          >{{ yr }}</button>
+        {%- endfor -%}
+
+      </div>
+
+      <button
+        class="ds-btn-ghost ds-results-table-section__sort-btn"
+        data-sort="date"
+        data-sort-dir="desc"
+        aria-label="Toggle sort order for results table"
+        aria-pressed="true"
+      >NEWEST FIRST</button>
+
+    </div>
+
+    <div class="ds-results-table-section__scroll-wrap">
+      <table class="ds-results-table" aria-describedby="table-heading">
+        <caption class="sr-only">Dreamstation Esports competitive results, sorted by most recent</caption>
+
+        <thead class="ds-results-table__head">
+          <tr>
+            <th scope="col" class="ds-results-table__th">Placement</th>
+            <th scope="col" class="ds-results-table__th">Event</th>
+            <th scope="col" class="ds-results-table__th">Game</th>
+            <th scope="col" class="ds-results-table__th">Region</th>
+            <th scope="col" class="ds-results-table__th">Season</th>
+            <th scope="col" class="ds-results-table__th">Date</th>
+            <th scope="col" class="ds-results-table__th">Prize</th>
+          </tr>
+        </thead>
+
+        <tbody class="ds-results-table__body" id="results-tbody">
+
+          {%- if all_results.size > 0 -%}
+
+            {%- for result in all_results -%}
+              {%- liquid
+                assign is_winner = false
+                if result.placement_number == 1
+                  assign is_winner = true
+                endif
+              -%}
+              <tr
+                class="ds-results-table__row"
+                data-year="{{ result.event_date | date: '%Y' }}"
+                data-date="{{ result.event_date }}"
+              >
+
+                {%- comment -%} Placement column — chip + sr-only companion {%- endcomment -%}
+                <td class="ds-results-table__td ds-results-table__td--placement">
+                  {%- if is_winner -%}
+                    <span class="ds-chip ds-chip--win" aria-hidden="true">{{ result.placement }}</span>
+                    <span class="sr-only">{{ result.placement }} — first place</span>
+                  {%- else -%}
+                    <span class="ds-chip" aria-hidden="true">{{ result.placement }}</span>
+                    <span class="sr-only">{{ result.placement }}</span>
+                  {%- endif -%}
+                </td>
+
+                {%- comment -%} Event name + optional external link {%- endcomment -%}
+                <td class="ds-results-table__td ds-results-table__td--event">
+                  {{ result.event_name }}
+                  {%- if result.external_link != blank -%}
+                    <a
+                      href="{{ result.external_link }}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="ds-results-table__ext-link"
+                      aria-label="External result link for {{ result.event_name }} (opens in new tab)"
+                    >&rarr;</a>
+                  {%- endif -%}
+                </td>
+
+                <td class="ds-results-table__td">
+                  {%- if result.game_title != blank -%}{{ result.game_title }}{%- else -%}&mdash;{%- endif -%}
+                </td>
+
+                <td class="ds-results-table__td">
+                  {%- if result.region != blank -%}{{ result.region }}{%- else -%}&mdash;{%- endif -%}
+                </td>
+
+                <td class="ds-results-table__td">
+                  {%- if result.season != blank -%}{{ result.season }}{%- else -%}&mdash;{%- endif -%}
+                </td>
+
+                <td class="ds-results-table__td">{{ result.event_date | date: '%b %Y' }}</td>
+
+                <td class="ds-results-table__td ds-results-table__td--prize">
+                  {%- if result.prize_usd != blank -%}
+                    ${{ result.prize_usd }}
+                  {%- else -%}
+                    &mdash;
+                  {%- endif -%}
+                </td>
+
+              </tr>
+            {%- endfor -%}
+
+          {%- else -%}
+
+            <tr class="ds-results-table__row ds-results-table__row--empty">
+              <td colspan="7" class="ds-results-table__empty">No results on record yet. The station is building.</td>
+            </tr>
+
+          {%- endif -%}
+
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</section>
+
+
+{% schema %}
+{
+  "name": "Results Page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_label",
+      "label": "Sub-label",
+      "default": "RLCS 2026 · APAC CIRCUIT"
+    },
+    {
+      "type": "text",
+      "id": "featured_heading",
+      "label": "Featured Section Heading",
+      "default": "FEATURED RESULTS"
+    },
+    {
+      "type": "text",
+      "id": "table_heading",
+      "label": "Table Section Heading",
+      "default": "FULL RECORD"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Results Page"
+    }
+  ]
+}
+{% endschema %}

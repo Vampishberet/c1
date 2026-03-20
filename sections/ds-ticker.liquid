@@ -1,0 +1,66 @@
+{% comment %}
+  Dreamstation Esports — Stat Ticker / Marquee
+  sections/ds-ticker.liquid
+
+  Rules:
+  - Content driven by dreamstation_settings.ticker_text metafield (pipe-separated)
+  - Full set duplicated in HTML for seamless CSS loop (translateX(-50%))
+  - Pause on hover (CSS). Pause on touchstart (JS — dreamstation.js)
+  - prefers-reduced-motion: animation stops (CSS handles it)
+  - No border-radius. No inline styles (CSS in dreamstation.css).
+  - .sr-only label for screen reader users
+{% endcomment %}
+
+{%- assign ds_settings = shop.metaobjects.dreamstation_settings.values.first -%}
+
+{%- comment -%}
+  Resolve ticker items.
+  Source: ds_settings.ticker_text (pipe-separated string).
+  Fallback: hardcoded defaults if metafield not configured.
+{%- endcomment -%}
+
+{%- if ds_settings.ticker_text != blank -%}
+  {%- assign ticker_raw = ds_settings.ticker_text -%}
+{%- else -%}
+  {%- assign ticker_raw = section.settings.ticker_fallback -%}
+{%- endif -%}
+
+{%- assign ticker_items = ticker_raw | split: '|' -%}
+
+<div class="ds-ticker" role="marquee" aria-label="Dreamstation Esports highlights" aria-live="off">
+  <span class="sr-only">Dreamstation Esports: {{ ticker_raw | replace: '|', ', ' }}</span>
+  <div class="ds-ticker__track" aria-hidden="true">
+    {%- comment -%} Set 1 {%- endcomment -%}
+    {%- for item in ticker_items -%}
+      <span class="ds-ticker__item">{{ item | strip }}</span>
+      <span class="ds-ticker__separator" aria-hidden="true">·</span>
+    {%- endfor -%}
+    {%- comment -%} Set 2 — duplicate for seamless infinite loop {%- endcomment -%}
+    {%- for item in ticker_items -%}
+      <span class="ds-ticker__item">{{ item | strip }}</span>
+      <span class="ds-ticker__separator" aria-hidden="true">·</span>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "DS Ticker",
+  "tag": "div",
+  "class": "ds-ticker-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "ticker_fallback",
+      "label": "Ticker content (fallback)",
+      "info": "Pipe-separated items. Used when no dreamstation_settings metaobject is configured.",
+      "default": "7× CHAMPIONS|RLCS 2026 ACTIVE|APAC CIRCUIT|EST. 2022|#ALWAYSDREAM"
+    }
+  ],
+  "presets": [
+    {
+      "name": "DS Ticker"
+    }
+  ]
+}
+{% endschema %}

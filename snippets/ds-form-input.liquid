@@ -1,0 +1,106 @@
+{% comment %}
+  Dreamstation Esports — Form Input
+  snippets/ds-form-input.liquid
+
+  Usage:
+    {% render 'ds-form-input',
+       type: 'text',
+       id: 'contact-name',
+       label: 'Full Name',
+       name: 'contact[name]',
+       required: true,
+       placeholder: 'Your name' %}
+
+    {% render 'ds-form-input',
+       type: 'textarea',
+       id: 'contact-message',
+       label: 'Message',
+       name: 'contact[body]',
+       required: true,
+       placeholder: 'Your message' %}
+
+  Parameters:
+    type         — 'text' | 'email' | 'tel' | 'textarea' | 'select'
+    id           — unique field id (required for label association)
+    label        — label text (required)
+    name         — form field name attribute
+    required     — boolean (true/false)
+    placeholder  — placeholder text
+    value        — pre-filled value
+    options      — for type='select': array of {value, label} objects
+    autocomplete — autocomplete attribute value (optional)
+
+  Rules:
+  - Every input MUST have a <label> with matching for/id — WCAG 2.1 AA
+  - Error state: add .is-error class via JS (dreamstation.js initFormValidation)
+  - Error message element: data-error-for="{{ id }}" id="{{ id }}-error"
+  - border-radius: 0 everywhere
+  - No inline <style> blocks
+{% endcomment %}
+
+{%- liquid
+  assign field_type = type | default: 'text'
+  assign is_required = required | default: false
+-%}
+
+<div class="ds-field">
+
+  {%- comment -%} Label — always required {%- endcomment -%}
+  <label class="ds-label" for="{{ id }}">
+    {{ label }}
+    {%- if is_required -%}
+      <span aria-hidden="true" style="color:var(--color-secondary-accent);margin-left:0.25rem;">*</span>
+      <span class="sr-only"> (required)</span>
+    {%- endif -%}
+  </label>
+
+  {%- comment -%} Field {%- endcomment -%}
+  {%- if field_type == 'textarea' -%}
+    <textarea
+      class="ds-textarea"
+      id="{{ id }}"
+      name="{{ name }}"
+      placeholder="{{ placeholder }}"
+      {%- if is_required %} required aria-required="true"{% endif %}
+      aria-describedby="{{ id }}-error"
+    >{{ value }}</textarea>
+
+  {%- elsif field_type == 'select' -%}
+    <select
+      class="ds-select"
+      id="{{ id }}"
+      name="{{ name }}"
+      {%- if is_required %} required aria-required="true"{% endif %}
+      aria-describedby="{{ id }}-error"
+    >
+      {%- for opt in options -%}
+        <option value="{{ opt.value }}"{% if opt.value == value %} selected{% endif %}>
+          {{ opt.label }}
+        </option>
+      {%- endfor -%}
+    </select>
+
+  {%- else -%}
+    <input
+      class="ds-input"
+      type="{{ field_type }}"
+      id="{{ id }}"
+      name="{{ name }}"
+      placeholder="{{ placeholder }}"
+      value="{{ value }}"
+      {%- if autocomplete != blank %} autocomplete="{{ autocomplete }}"{% endif %}
+      {%- if is_required %} required aria-required="true"{% endif %}
+      aria-describedby="{{ id }}-error"
+    >
+  {%- endif -%}
+
+  {%- comment -%} Error message — populated by JS, read by aria-describedby {%- endcomment -%}
+  <span
+    class="ds-error-message"
+    id="{{ id }}-error"
+    data-error-for="{{ id }}"
+    role="alert"
+    aria-live="polite"
+  ></span>
+
+</div>

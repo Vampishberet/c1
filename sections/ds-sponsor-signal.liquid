@@ -1,0 +1,109 @@
+{%- comment -%}
+  Dreamstation Esports — Sponsor Signal
+  sections/ds-sponsor-signal.liquid
+
+  Two mutually exclusive states — NEVER both, NEVER empty grid:
+    STATE 1 (partners exist)  → heading + logo bar
+    STATE 2 (no partners)     → sponsor acquisition CTA block
+
+  Speed A · .ds-surface grain · background: --color-surface-container-high
+  No clip-path on section edges — tonal shift only.
+{%- endcomment -%}
+
+{%- assign active_partners = shop.metaobjects.dreamstation_partner.values | where: 'is_active', true -%}
+
+<section
+  class="ds-sponsor-signal ds-surface"
+  aria-labelledby="ds-sponsor-signal-heading"
+>
+  <div class="ds-sponsor-signal__inner">
+
+    {%- if active_partners.size > 0 -%}
+
+      {%- comment -%} STATE 1 — Partners exist {%- endcomment -%}
+
+      <div class="ds-animate-in">
+        <h2
+          id="ds-sponsor-signal-heading"
+          class="ds-sponsor-signal__heading"
+        >
+          {{ section.settings.heading_partners }}
+        </h2>
+
+        <p class="ds-sponsor-signal__sublabel" aria-hidden="true">
+          RLCS 2026 &middot; APAC CIRCUIT
+        </p>
+        <span class="sr-only">RLCS 2026 APAC Circuit</span>
+      </div>
+
+      <div class="ds-animate-in">
+        {%- render 'ds-sponsor-bar' -%}
+      </div>
+
+    {%- else -%}
+
+      {%- comment -%} STATE 2 — No partners: sponsor acquisition CTA {%- endcomment -%}
+
+      <div class="ds-animate-in">
+        <h2
+          id="ds-sponsor-signal-heading"
+          class="ds-sponsor-signal__heading"
+        >
+          {{ section.settings.heading_cta }}
+        </h2>
+
+        <p class="ds-sponsor-signal__sublabel" aria-hidden="true">
+          NAMING RIGHTS AVAILABLE &mdash; RLCS 2026 APAC ROSTER
+        </p>
+        <span class="sr-only">Naming rights available — RLCS 2026 APAC Roster</span>
+      </div>
+
+      <div class="ds-animate-in">
+        <p class="ds-sponsor-signal__cta-body">
+          Elite esports. APAC circuit. Naming rights for a team that competes.
+        </p>
+
+        {%- render 'ds-cta-button',
+          variant: 'primary',
+          label: section.settings.cta_label,
+          url: '/pages/partners'
+        -%}
+      </div>
+
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Sponsor Signal",
+  "tag": "section",
+  "class": "ds-sponsor-signal-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading_partners",
+      "label": "Heading — Partners state",
+      "default": "OUR PARTNERS"
+    },
+    {
+      "type": "text",
+      "id": "heading_cta",
+      "label": "Heading — CTA state",
+      "default": "PARTNER WITH DREAMSTATION"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA button label",
+      "default": "START THE CONVERSATION"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sponsor Signal"
+    }
+  ]
+}
+{% endschema %}

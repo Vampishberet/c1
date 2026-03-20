@@ -1,0 +1,30 @@
+{% comment %}
+  Dreamstation Esports — Performance Chip
+  snippets/ds-performance-chip.liquid
+
+  Usage:
+    {% render 'ds-performance-chip', variant: 'win', label: 'W' %}
+    {% render 'ds-performance-chip', variant: 'live', label: 'LIVE' %}
+
+  Parameters:
+    variant  — 'live' | 'win' | 'loss' | 'sub' | 'upcoming' | 'inactive' | '' (default purple)
+    label    — Short display text shown in chip (e.g. 'W', 'L', 'LIVE', 'SUB')
+    sr_label — Full screen-reader text (optional — defaults to label if omitted)
+
+  Rules:
+  - ALWAYS pair visible chip with .sr-only span — WCAG 2.1 AA requirement
+  - border-radius: 0
+  - CSS handles colour variants via .ds-chip--[variant]
+{% endcomment %}
+
+{%- liquid
+  assign chip_class = 'ds-chip'
+  if variant != blank
+    assign chip_class = chip_class | append: ' ds-chip--' | append: variant
+  endif
+
+  assign accessible_label = sr_label | default: label
+-%}
+
+<span class="{{ chip_class }}" aria-hidden="true">{{ label }}</span>
+<span class="sr-only">{{ accessible_label }}</span>

@@ -1,0 +1,116 @@
+{% comment %}
+  Dreamstation Esports — Global Footer
+  snippets/ds-footer.liquid
+
+  Usage: {% render 'ds-footer' %}
+
+  Rules:
+  - Must appear on every page including 404
+  - No border-radius
+  - Conditional naming rights strip from dreamstation_settings metaobject
+  - All CSS in assets/dreamstation.css (.ds-footer)
+  - No horizontal divider lines — tonal colour shifts only
+{% endcomment %}
+
+{% assign ds_settings = shop.metaobjects.dreamstation_settings.values.first %}
+
+<footer class="ds-footer" role="contentinfo">
+
+  {%- comment -%}
+    Naming rights strip — only renders if naming_rights_available = true
+  {%- endcomment -%}
+  {%- if ds_settings.naming_rights_available -%}
+    <div class="ds-footer__naming-strip">
+      <span class="ds-chip" aria-hidden="true">NAMING RIGHTS AVAILABLE</span>
+      <span class="sr-only">Naming rights available</span>
+      <span>RLCS 2026 APAC ROSTER</span>
+      <a href="/pages/partners" class="ds-footer__naming-link">ENQUIRE →</a>
+    </div>
+  {%- endif -%}
+
+  <div class="ds-footer__main">
+
+    {%- comment -%} Left: Logo + tagline {%- endcomment -%}
+    <div class="ds-footer__brand">
+      {%- if settings.logo != blank -%}
+        <a href="/" aria-label="Dreamstation Esports — Home">
+          {{ settings.logo | image_url: width: 200 | image_tag:
+              alt: shop.name,
+              class: 'ds-footer__logo',
+              loading: 'lazy',
+              width: 140,
+              height: 28 }}
+        </a>
+      {%- else -%}
+        <a href="/" aria-label="Dreamstation Esports — Home" style="text-decoration:none;">
+          <span style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-on-surface);">
+            DREAMSTATION
+          </span>
+        </a>
+      {%- endif -%}
+      <p class="ds-footer__tagline">Culture. Creation. Dreams.</p>
+    </div>
+
+    {%- comment -%} Centre: Nav links {%- endcomment -%}
+    <nav class="ds-footer__nav" aria-label="Footer navigation">
+      <ul class="ds-footer__nav-list" role="list">
+        <li><a href="/pages/team"     class="ds-footer__nav-link">Team</a></li>
+        <li><a href="/pages/results"  class="ds-footer__nav-link">Results</a></li>
+        <li><a href="/pages/content"  class="ds-footer__nav-link">Content</a></li>
+        <li><a href="/pages/partners" class="ds-footer__nav-link">Partners</a></li>
+        <li><a href="/collections/all" class="ds-footer__nav-link">Shop</a></li>
+        <li><a href="/pages/about"    class="ds-footer__nav-link">About</a></li>
+        <li><a href="/pages/contact"  class="ds-footer__nav-link">Contact</a></li>
+      </ul>
+    </nav>
+
+    {%- comment -%} Right: Social icons {%- endcomment -%}
+    <div class="ds-footer__social">
+      <div class="ds-footer__social-links">
+
+        {%- comment -%} X / Twitter {%- endcomment -%}
+        <a href="https://x.com/DreamstationGG"
+           class="ds-footer__social-link"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Dreamstation Esports on X (Twitter)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.629 5.905-5.629zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        </a>
+
+        {%- comment -%} YouTube (GroundZero000 content) {%- endcomment -%}
+        <a href="https://youtube.com/@DreamstationGG"
+           class="ds-footer__social-link"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Dreamstation Esports on YouTube">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+            <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+          </svg>
+        </a>
+
+        {%- comment -%} TikTok {%- endcomment -%}
+        <a href="https://tiktok.com/@DreamstationGG"
+           class="ds-footer__social-link"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Dreamstation Esports on TikTok">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+            <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/>
+          </svg>
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+
+  {%- comment -%} Bottom copyright bar {%- endcomment -%}
+  <div class="ds-footer__bottom">
+    <p class="ds-footer__copyright">
+      &copy; {{ 'now' | date: '%Y' }} Dreamstation Esports. All rights reserved.
+    </p>
+  </div>
+
+</footer>

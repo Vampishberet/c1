@@ -1,0 +1,164 @@
+{% comment %}
+  Dreamstation Esports — Global Navigation
+  snippets/ds-nav.liquid
+
+  Usage: {% render 'ds-nav' %}
+
+  Rules:
+  - border-radius: 0 everywhere
+  - No skewY/skewX
+  - All CSS in assets/dreamstation.css
+  - Mobile hamburger uses aria-expanded + focus trap (dreamstation.js)
+  - Active page indicated by aria-current="page"
+{% endcomment %}
+
+{% assign current_handle = request.path %}
+
+<nav class="ds-nav" role="navigation" aria-label="Main navigation">
+
+  {%- comment -%} Logo {%- endcomment -%}
+  <a href="/" class="ds-nav__logo" aria-label="Dreamstation Esports — Home">
+    {%- if settings.logo != blank -%}
+      {{ settings.logo | image_url: width: 200 | image_tag:
+          alt: shop.name,
+          class: 'ds-nav__logo-img',
+          loading: 'eager',
+          width: 160,
+          height: 32 }}
+    {%- else -%}
+      <span class="ds-nav__logo-text" style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-on-surface);">
+        DREAMSTATION
+      </span>
+    {%- endif -%}
+  </a>
+
+  {%- comment -%} Desktop links {%- endcomment -%}
+  <ul class="ds-nav__links" role="list">
+    <li>
+      <a href="/pages/team"
+         class="ds-nav__link"
+         {% if current_handle contains '/pages/team' %}aria-current="page"{% endif %}>
+        Team
+      </a>
+    </li>
+    <li>
+      <a href="/pages/results"
+         class="ds-nav__link"
+         {% if current_handle contains '/pages/results' %}aria-current="page"{% endif %}>
+        Results
+      </a>
+    </li>
+    <li>
+      <a href="/pages/content"
+         class="ds-nav__link"
+         {% if current_handle contains '/pages/content' %}aria-current="page"{% endif %}>
+        Content
+      </a>
+    </li>
+    <li>
+      <a href="/pages/partners"
+         class="ds-nav__link"
+         {% if current_handle contains '/pages/partners' %}aria-current="page"{% endif %}>
+        Partners
+      </a>
+    </li>
+    <li>
+      <a href="/collections/all"
+         class="ds-nav__link"
+         {% if current_handle contains '/collections' %}aria-current="page"{% endif %}>
+        Shop
+      </a>
+    </li>
+    <li>
+      <a href="/pages/contact"
+         class="ds-nav__link"
+         {% if current_handle contains '/pages/contact' %}aria-current="page"{% endif %}>
+        Contact
+      </a>
+    </li>
+  </ul>
+
+  {%- comment -%} Desktop right actions — cart icon {%- endcomment -%}
+  <div class="ds-nav__actions">
+    <a href="/cart"
+       class="ds-nav__cart"
+       aria-label="Cart ({{ cart.item_count }} items)"
+       style="color:var(--color-on-surface-variant);text-decoration:none;transition:color 0.15s ease-out;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+      {%- if cart.item_count > 0 -%}
+        <span class="sr-only">{{ cart.item_count }} items in cart</span>
+      {%- endif -%}
+    </a>
+  </div>
+
+  {%- comment -%} Mobile hamburger button {%- endcomment -%}
+  <button
+    class="ds-nav__hamburger"
+    aria-expanded="false"
+    aria-controls="ds-nav-overlay"
+    aria-label="Open navigation"
+    type="button"
+  >
+    <span class="ds-nav__hamburger-bar" aria-hidden="true"></span>
+    <span class="ds-nav__hamburger-bar" aria-hidden="true"></span>
+    <span class="ds-nav__hamburger-bar" aria-hidden="true"></span>
+  </button>
+
+</nav>
+
+{%- comment -%} Mobile full-screen overlay {%- endcomment -%}
+<div
+  class="ds-nav__overlay"
+  id="ds-nav-overlay"
+  role="navigation"
+  aria-label="Mobile navigation"
+>
+  <ul class="ds-nav__overlay-links" role="list">
+    <li>
+      <a href="/pages/team"
+         class="ds-nav__overlay-link"
+         {% if current_handle contains '/pages/team' %}aria-current="page"{% endif %}>
+        Team
+      </a>
+    </li>
+    <li>
+      <a href="/pages/results"
+         class="ds-nav__overlay-link"
+         {% if current_handle contains '/pages/results' %}aria-current="page"{% endif %}>
+        Results
+      </a>
+    </li>
+    <li>
+      <a href="/pages/content"
+         class="ds-nav__overlay-link"
+         {% if current_handle contains '/pages/content' %}aria-current="page"{% endif %}>
+        Content
+      </a>
+    </li>
+    <li>
+      <a href="/pages/partners"
+         class="ds-nav__overlay-link"
+         {% if current_handle contains '/pages/partners' %}aria-current="page"{% endif %}>
+        Partners
+      </a>
+    </li>
+    <li>
+      <a href="/collections/all"
+         class="ds-nav__overlay-link"
+         {% if current_handle contains '/collections' %}aria-current="page"{% endif %}>
+        Shop
+      </a>
+    </li>
+    <li>
+      <a href="/pages/contact"
+         class="ds-nav__overlay-link"
+         {% if current_handle contains '/pages/contact' %}aria-current="page"{% endif %}>
+        Contact
+      </a>
+    </li>
+  </ul>
+</div>

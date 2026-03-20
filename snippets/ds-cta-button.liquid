@@ -1,0 +1,60 @@
+{% comment %}
+  Dreamstation Esports — CTA Button
+  snippets/ds-cta-button.liquid
+
+  Usage:
+    {% render 'ds-cta-button', variant: 'primary', label: 'EXPLORE THE TEAM', url: '/pages/team' %}
+    {% render 'ds-cta-button', variant: 'ghost', label: 'PARTNER WITH US', url: '/pages/partners' %}
+    {% render 'ds-cta-button', variant: 'cyan', label: 'START THE CONVERSATION', url: '/pages/partners' %}
+    {% render 'ds-cta-button', variant: 'primary', label: 'SEND MESSAGE', type: 'submit' %}
+
+  Parameters:
+    variant  — 'primary' | 'ghost' | 'cyan'  (default: 'primary')
+    label    — Button text (UPPERCASE recommended — CTA convention)
+    url      — href for link buttons (omit for type='button' or type='submit')
+    type     — 'link' | 'button' | 'submit'  (default: 'link')
+    target   — '_blank' etc. (optional, for external links)
+    attrs    — additional HTML attributes string (optional)
+
+  Rules:
+  - border-radius: 0 — hard rule, never add border-radius
+  - font-family: Space Grotesk 700, UPPERCASE, letter-spacing: 0.08em
+  - :hover and :focus-visible handled by CSS (dreamstation.css)
+  - Renders <a> for type='link', <button> for type='button'/'submit'
+  - External links get rel="noopener noreferrer" automatically
+{% endcomment %}
+
+{%- liquid
+  assign btn_variant = variant | default: 'primary'
+  assign btn_type    = type    | default: 'link'
+  assign btn_class   = 'ds-btn-primary'
+  if btn_variant == 'ghost'
+    assign btn_class = 'ds-btn-ghost'
+  elsif btn_variant == 'cyan'
+    assign btn_class = 'ds-btn-cyan'
+  endif
+-%}
+
+{%- if btn_type == 'link' -%}
+  <a
+    href="{{ url }}"
+    class="{{ btn_class }}"
+    {%- if target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %}
+    {{ attrs }}
+  >{{ label }}</a>
+
+{%- elsif btn_type == 'submit' -%}
+  <button
+    type="submit"
+    class="{{ btn_class }}"
+    {{ attrs }}
+  >{{ label }}</button>
+
+{%- else -%}
+  <button
+    type="button"
+    class="{{ btn_class }}"
+    {{ attrs }}
+  >{{ label }}</button>
+
+{%- endif -%}
