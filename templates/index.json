@@ -1,41 +1,44 @@
 {
   "sections": {
-    "ds-ticker": {
+    "ds_hero": {
+      "type": "ds-hero",
+      "settings": {
+        "title": "WHERE AMBITION COMPETES",
+        "description": "APAC'S PREMIER MULTI-TITLE ESPORTS ORGANIZATION. ELITE PERFORMANCE. UNYIELDING CREATION."
+      }
+    },
+    "ds_ticker": {
       "type": "ds-ticker",
       "settings": {}
     },
-    "ds-hero": {
-      "type": "ds-hero",
-      "settings": {}
-    },
-    "ds-roster-preview": {
+    "ds_roster_preview": {
       "type": "ds-roster-preview",
       "settings": {}
     },
-    "ds-results-preview": {
+    "ds_results_preview": {
       "type": "ds-results-preview",
       "settings": {}
     },
-    "ds-content-proof": {
+    "ds_content_proof": {
       "type": "ds-content-proof",
       "settings": {}
     },
-    "ds-sponsor-signal": {
+    "ds_sponsor_signal": {
       "type": "ds-sponsor-signal",
       "settings": {}
     },
-    "ds-merch-entry": {
+    "ds_merch_entry": {
       "type": "ds-merch-entry",
       "settings": {}
     }
   },
   "order": [
-    "ds-hero",
-    "ds-ticker",
-    "ds-roster-preview",
-    "ds-results-preview",
-    "ds-content-proof",
-    "ds-sponsor-signal",
-    "ds-merch-entry"
+    "ds_hero",
+    "ds_ticker",
+    "ds_roster_preview",
+    "ds_results_preview",
+    "ds_content_proof",
+    "ds_sponsor_signal",
+    "ds_merch_entry"
   ]
 }
